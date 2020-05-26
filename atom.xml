@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://Robotzeroo.github.io</id>
     <title>Just enjoy</title>
-    <updated>2020-05-23T02:42:34.666Z</updated>
+    <updated>2020-05-26T11:31:21.835Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://Robotzeroo.github.io"/>
     <link rel="self" href="https://Robotzeroo.github.io/atom.xml"/>
@@ -10,6 +10,99 @@
     <logo>https://Robotzeroo.github.io/images/avatar.png</logo>
     <icon>https://Robotzeroo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, Just enjoy</rights>
+    <entry>
+        <title type="html"><![CDATA[Linux文件系统与磁盘]]></title>
+        <id>https://Robotzeroo.github.io/post/linux-wen-jian-xi-tong-yu-ci-pan/</id>
+        <link href="https://Robotzeroo.github.io/post/linux-wen-jian-xi-tong-yu-ci-pan/">
+        </link>
+        <updated>2020-05-26T09:57:09.000Z</updated>
+        <summary type="html"><![CDATA[<p>2020/5/26</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>2020/5/26</p>
+<!-- more -->
+<p>基于centos7.x，文件系统为xfs。xfs是一个日志文件系统，分为三个部分，一个数据区、一个文本系统活动登陆区（日志区）以及一个实时运行区。数据区分为多个存储区群组来分别放置文件系统所需要的数据：</p>
+<table>
+<thead>
+<tr>
+<th>boot sector</th>
+<th>allocation groups1</th>
+<th>allocation groups2</th>
+<th>....</th>
+<th>allocation groupsN</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<p>每个存储区群组结构大致如下：</p>
+<table>
+<thead>
+<tr>
+<th>super block</th>
+<th>文件系统描述</th>
+<th>区块对应表</th>
+<th>inode对应表</th>
+<th>inode table</th>
+<th>data block</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<p>一个文件分配1个inode，文件内容由inode来指向，而一个inode可以指定多个data block，每个data block为4kb。要想读取该文件，必须要经过目录记录的文件名来只想到正确的inode号码才能读取。</p>
+<h2 id="相关命令"><strong>相关命令</strong></h2>
+<h3 id="xfs_info-查看super-block区块内容"><strong>xfs_info 查看super block区块内容</strong></h3>
+<h3 id="df-列出文件系统的整体磁盘使用量"><strong>df 列出文件系统的整体磁盘使用量</strong></h3>
+<h3 id="du-查看文件系统的磁盘使用量查看目录所占磁盘空间"><strong>du 查看文件系统的磁盘使用量（查看目录所占磁盘空间）</strong></h3>
+<h3 id="ln-硬链接和符号链接"><strong>ln 硬链接和符号链接</strong></h3>
+<p>-s为符号链接，不加为硬链接。硬链接只是在某个目录下新增一条文件名连接到某个inode号码的关联记录而已。符号链接相当于Windows里的快捷方式。</p>
+<h2 id="磁盘的分区-格式化-检验与挂载"><strong>磁盘的分区、格式化、检验与挂载</strong></h2>
+<p>当在系统里加一块磁盘需要进行一下四步：</p>
+<ol>
+<li>对磁盘划分，建立可用的硬盘分区（GPT）</li>
+<li>对硬盘分区格式化，建立系统可用的<strong>文件系统</strong></li>
+<li>（可选）对文件系统进行检验与修复</li>
+<li>建立挂载点（目录），并将它挂载上来</li>
+</ol>
+<h3 id="观察磁盘状态"><strong>观察磁盘状态</strong></h3>
+<p>lsblk 列出系统上所有磁盘列表<br>
+blkid 列出设备的UUID等参数，输出每一行代表一个文件系统</p>
+<h3 id="磁盘分区"><strong>磁盘分区</strong></h3>
+<p>fdisk 用于MBR分区<br>
+gdisk 用于GPT分区，“last sector”选项设置分区大小，“hex code”选项设置分区格式（xfs,ext4...）,分区之后用命令：partprobe 更新linux内核的分区表，不用重启。</p>
+<h3 id="磁盘格式化"><strong>磁盘格式化</strong></h3>
+<p>mkfs.xfs 用于格式化磁盘为xfs文件系统<br>
+mkfs.ext4 用于格式化磁盘为ext4文件系统<br>
+mkfs -t [] [] 格式化磁盘为其他格式</p>
+<h3 id="文件系统检验"><strong>文件系统检验</strong></h3>
+<p>xfs_repair 检查修复xfs文件系统<br>
+fsck.ext4 检查修复ext4文件系统<br>
+被检查修复的硬盘分区必不挂在到系统上，必须是卸载状态</p>
+<h3 id="文件系统挂载与卸载"><strong>文件系统挂载与卸载</strong></h3>
+<p>要作为挂载点的目录，理论上应该是空目录才可<br>
+挂载命令：<br>
+mount [LABEL=''] [挂载点]<br>
+mount [UUID=''] [挂载点]<br>
+mount [设备文件名] [挂载点]<br>
+卸载命令：（若进行卸载必须将工作目录移到挂载点之外）<br>
+umount [-fln] 设备文件名或挂载点</p>
+<h3 id="重新挂载根目录与挂载不特定目录"><strong>重新挂载根目录与挂载不特定目录</strong></h3>
+<p>当你的挂载参数要改变或根目录出现只读（ro）状态时，需要重新挂载根目录<br>
+mount -o remount,rw,auto/<br>
+将目录挂载到目录，也可以用符号链接ln来搞定，从此进入挂载目录等于进入被挂载目录<br>
+mount --bind [] []</p>
+<h3 id="文件系统磁盘参数自定义"><strong>文件系统/磁盘参数自定义</strong></h3>
+<p>linux下面的所有设备都以文件来表示，文件通过major与minor数值来表示<br>
+mknod 设备文件名 [-bcp] [major] [minor]<br>
+b:设置设备名称为外接存储设备，磁盘..<br>
+c:..........................为外界输入设备，鼠标键盘...<br>
+p:.........................为FIFO文件<br>
+xfs_admin 修改xfs文件系统的UUID和label name<br>
+tune2fs 修改ext4的label name 和UUID<br>
+uuidgen 产生新的UUID</p>
+<h2 id="设置启动挂载"><strong>设置启动挂载</strong></h2>
+<p>编辑etc/fstab 配置文件内容，可以设置启动挂载：<br>
+添加[UUID/设备名] [挂载点] [文件系统] [文件系统参数] [dump] [fsck]</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[公告]]></title>
         <id>https://Robotzeroo.github.io/post/gong-gao/</id>

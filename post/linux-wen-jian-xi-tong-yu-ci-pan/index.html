@@ -1,0 +1,279 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linux文件系统与磁盘 | Just enjoy</title>
+<link rel="shortcut icon" href="https://Robotzeroo.github.io/favicon.ico?v=1590492676632">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://Robotzeroo.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Linux文件系统与磁盘 | Just enjoy - Atom Feed" href="https://Robotzeroo.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="2020/5/26
+
+基于centos7.x，文件系统为xfs。xfs是一个日志文件系统，分为三个部分，一个数据区、一个文本系统活动登陆区（日志区）以及一个实时运行区。数据区分为多个存储区群组来分别放置文件系统所需要的数据：
+
+
+
+boot..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://Robotzeroo.github.io">
+  <img class="avatar" src="https://Robotzeroo.github.io/images/avatar.png?v=1590492676632" alt="">
+  </a>
+  <h1 class="site-title">
+    Just enjoy
+  </h1>
+  <p class="site-description">
+    han's blog
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://Robotzeroo.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Linux文件系统与磁盘
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-05-26
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>2020/5/26</p>
+<!-- more -->
+<p>基于centos7.x，文件系统为xfs。xfs是一个日志文件系统，分为三个部分，一个数据区、一个文本系统活动登陆区（日志区）以及一个实时运行区。数据区分为多个存储区群组来分别放置文件系统所需要的数据：</p>
+<table>
+<thead>
+<tr>
+<th>boot sector</th>
+<th>allocation groups1</th>
+<th>allocation groups2</th>
+<th>....</th>
+<th>allocation groupsN</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<p>每个存储区群组结构大致如下：</p>
+<table>
+<thead>
+<tr>
+<th>super block</th>
+<th>文件系统描述</th>
+<th>区块对应表</th>
+<th>inode对应表</th>
+<th>inode table</th>
+<th>data block</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<p>一个文件分配1个inode，文件内容由inode来指向，而一个inode可以指定多个data block，每个data block为4kb。要想读取该文件，必须要经过目录记录的文件名来只想到正确的inode号码才能读取。</p>
+<h2 id="相关命令"><strong>相关命令</strong></h2>
+<h3 id="xfs_info-查看super-block区块内容"><strong>xfs_info 查看super block区块内容</strong></h3>
+<h3 id="df-列出文件系统的整体磁盘使用量"><strong>df 列出文件系统的整体磁盘使用量</strong></h3>
+<h3 id="du-查看文件系统的磁盘使用量查看目录所占磁盘空间"><strong>du 查看文件系统的磁盘使用量（查看目录所占磁盘空间）</strong></h3>
+<h3 id="ln-硬链接和符号链接"><strong>ln 硬链接和符号链接</strong></h3>
+<p>-s为符号链接，不加为硬链接。硬链接只是在某个目录下新增一条文件名连接到某个inode号码的关联记录而已。符号链接相当于Windows里的快捷方式。</p>
+<h2 id="磁盘的分区-格式化-检验与挂载"><strong>磁盘的分区、格式化、检验与挂载</strong></h2>
+<p>当在系统里加一块磁盘需要进行一下四步：</p>
+<ol>
+<li>对磁盘划分，建立可用的硬盘分区（GPT）</li>
+<li>对硬盘分区格式化，建立系统可用的<strong>文件系统</strong></li>
+<li>（可选）对文件系统进行检验与修复</li>
+<li>建立挂载点（目录），并将它挂载上来</li>
+</ol>
+<h3 id="观察磁盘状态"><strong>观察磁盘状态</strong></h3>
+<p>lsblk 列出系统上所有磁盘列表<br>
+blkid 列出设备的UUID等参数，输出每一行代表一个文件系统</p>
+<h3 id="磁盘分区"><strong>磁盘分区</strong></h3>
+<p>fdisk 用于MBR分区<br>
+gdisk 用于GPT分区，“last sector”选项设置分区大小，“hex code”选项设置分区格式（xfs,ext4...）,分区之后用命令：partprobe 更新linux内核的分区表，不用重启。</p>
+<h3 id="磁盘格式化"><strong>磁盘格式化</strong></h3>
+<p>mkfs.xfs 用于格式化磁盘为xfs文件系统<br>
+mkfs.ext4 用于格式化磁盘为ext4文件系统<br>
+mkfs -t [] [] 格式化磁盘为其他格式</p>
+<h3 id="文件系统检验"><strong>文件系统检验</strong></h3>
+<p>xfs_repair 检查修复xfs文件系统<br>
+fsck.ext4 检查修复ext4文件系统<br>
+被检查修复的硬盘分区必不挂在到系统上，必须是卸载状态</p>
+<h3 id="文件系统挂载与卸载"><strong>文件系统挂载与卸载</strong></h3>
+<p>要作为挂载点的目录，理论上应该是空目录才可<br>
+挂载命令：<br>
+mount [LABEL=''] [挂载点]<br>
+mount [UUID=''] [挂载点]<br>
+mount [设备文件名] [挂载点]<br>
+卸载命令：（若进行卸载必须将工作目录移到挂载点之外）<br>
+umount [-fln] 设备文件名或挂载点</p>
+<h3 id="重新挂载根目录与挂载不特定目录"><strong>重新挂载根目录与挂载不特定目录</strong></h3>
+<p>当你的挂载参数要改变或根目录出现只读（ro）状态时，需要重新挂载根目录<br>
+mount -o remount,rw,auto/<br>
+将目录挂载到目录，也可以用符号链接ln来搞定，从此进入挂载目录等于进入被挂载目录<br>
+mount --bind [] []</p>
+<h3 id="文件系统磁盘参数自定义"><strong>文件系统/磁盘参数自定义</strong></h3>
+<p>linux下面的所有设备都以文件来表示，文件通过major与minor数值来表示<br>
+mknod 设备文件名 [-bcp] [major] [minor]<br>
+b:设置设备名称为外接存储设备，磁盘..<br>
+c:..........................为外界输入设备，鼠标键盘...<br>
+p:.........................为FIFO文件<br>
+xfs_admin 修改xfs文件系统的UUID和label name<br>
+tune2fs 修改ext4的label name 和UUID<br>
+uuidgen 产生新的UUID</p>
+<h2 id="设置启动挂载"><strong>设置启动挂载</strong></h2>
+<p>编辑etc/fstab 配置文件内容，可以设置启动挂载：<br>
+添加[UUID/设备名] [挂载点] [文件系统] [文件系统参数] [dump] [fsck]</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4"><strong>相关命令</strong></a>
+<ul>
+<li><a href="#xfs_info-%E6%9F%A5%E7%9C%8Bsuper-block%E5%8C%BA%E5%9D%97%E5%86%85%E5%AE%B9"><strong>xfs_info 查看super block区块内容</strong></a></li>
+<li><a href="#df-%E5%88%97%E5%87%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%95%B4%E4%BD%93%E7%A3%81%E7%9B%98%E4%BD%BF%E7%94%A8%E9%87%8F"><strong>df 列出文件系统的整体磁盘使用量</strong></a></li>
+<li><a href="#du-%E6%9F%A5%E7%9C%8B%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A3%81%E7%9B%98%E4%BD%BF%E7%94%A8%E9%87%8F%E6%9F%A5%E7%9C%8B%E7%9B%AE%E5%BD%95%E6%89%80%E5%8D%A0%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4"><strong>du 查看文件系统的磁盘使用量（查看目录所占磁盘空间）</strong></a></li>
+<li><a href="#ln-%E7%A1%AC%E9%93%BE%E6%8E%A5%E5%92%8C%E7%AC%A6%E5%8F%B7%E9%93%BE%E6%8E%A5"><strong>ln 硬链接和符号链接</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E7%A3%81%E7%9B%98%E7%9A%84%E5%88%86%E5%8C%BA-%E6%A0%BC%E5%BC%8F%E5%8C%96-%E6%A3%80%E9%AA%8C%E4%B8%8E%E6%8C%82%E8%BD%BD"><strong>磁盘的分区、格式化、检验与挂载</strong></a>
+<ul>
+<li><a href="#%E8%A7%82%E5%AF%9F%E7%A3%81%E7%9B%98%E7%8A%B6%E6%80%81"><strong>观察磁盘状态</strong></a></li>
+<li><a href="#%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><strong>磁盘分区</strong></a></li>
+<li><a href="#%E7%A3%81%E7%9B%98%E6%A0%BC%E5%BC%8F%E5%8C%96"><strong>磁盘格式化</strong></a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%A3%80%E9%AA%8C"><strong>文件系统检验</strong></a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%8C%82%E8%BD%BD%E4%B8%8E%E5%8D%B8%E8%BD%BD"><strong>文件系统挂载与卸载</strong></a></li>
+<li><a href="#%E9%87%8D%E6%96%B0%E6%8C%82%E8%BD%BD%E6%A0%B9%E7%9B%AE%E5%BD%95%E4%B8%8E%E6%8C%82%E8%BD%BD%E4%B8%8D%E7%89%B9%E5%AE%9A%E7%9B%AE%E5%BD%95"><strong>重新挂载根目录与挂载不特定目录</strong></a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%A3%81%E7%9B%98%E5%8F%82%E6%95%B0%E8%87%AA%E5%AE%9A%E4%B9%89"><strong>文件系统/磁盘参数自定义</strong></a></li>
+</ul>
+</li>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E5%90%AF%E5%8A%A8%E6%8C%82%E8%BD%BD"><strong>设置启动挂载</strong></a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://Robotzeroo.github.io/post/gong-gao/">
+              <h3 class="post-title">
+                公告
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://Robotzeroo.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
