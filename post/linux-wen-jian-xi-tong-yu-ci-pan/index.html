@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Linux文件系统与磁盘 | Just enjoy</title>
-<link rel="shortcut icon" href="https://Robotzeroo.github.io/favicon.ico?v=1590492715004">
+<link rel="shortcut icon" href="https://Robotzeroo.github.io/favicon.ico?v=1590564837582">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://Robotzeroo.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Linux文件系统与磁盘 | Just enjoy - Atom Feed" href="https://Robotzeroo.github.io/atom.xml">
@@ -27,7 +27,7 @@ boot..." />
       <div class="main-content">
         <div class="site-header">
   <a href="https://Robotzeroo.github.io">
-  <img class="avatar" src="https://Robotzeroo.github.io/images/avatar.png?v=1590492715004" alt="">
+  <img class="avatar" src="https://Robotzeroo.github.io/images/avatar.png?v=1590564837582" alt="">
   </a>
   <h1 class="site-title">
     Just enjoy
@@ -87,7 +87,7 @@ boot..." />
                 2020-05-26
               </span>
               <span>
-                4 min read
+                5 min read
               </span>
               
                 <a href="https://Robotzeroo.github.io/tag/CKW95Wvau/" class="post-tag">
@@ -181,6 +181,28 @@ uuidgen 产生新的UUID</p>
 <h2 id="设置启动挂载"><strong>设置启动挂载</strong></h2>
 <p>编辑etc/fstab 配置文件内容，可以设置启动挂载：<br>
 添加[UUID/设备名] [挂载点] [文件系统] [文件系统参数] [dump] [fsck]</p>
+<h2 id="特殊设备loop挂载"><strong>特殊设备loop挂载</strong></h2>
+<p>如果当初在分区时，你只有划分出一个根目录，假设你已经没有多余的容量可以进行额外的分区，但是根目录的容量还很大。此时你可以制作出一个大文件，将这个文件挂载，如此一来感觉是就多了一个分区，用途广泛。<br>
+例如在/srv下建立一个512MB的大文件，将这个大文件格式化并挂载到/data/file<br>
+dd  if=/dev/zero   of=/srv/loopdev   bs=1M  count=512<br>
+//bs-block size  count-block number<br>
+mkfs.xfs  -f  /srv/loopdev<br>
+blkid  /srv/loopdev<br>
+mount  -o  loop  UUID='xxxx'   /data/file<br>
+nano  /etc/fstab<br>
+:   /srv/loopdev  /data/file  xfs  defaults,loop  0  0<br>
+mkdir  /data/file<br>
+mount -a</p>
+<h2 id="内存交换区swap创建"><strong>内存交换区swap创建</strong></h2>
+<p>意义：当计算机内存不足时，可以将内存中的数据拿到硬盘中暂时存放的地方叫做内存交换分区。</p>
+<ol>
+<li>使用物理分区创建内存交换分区<br>
+分区gdisk--&gt;格式化mkswap---&gt;将swap设备启动[swapon 设备文件名]----&gt;观察free, swapon -s 两个命令观察内存使用量。</li>
+<li>使用文件创建内存交换文件<br>
+使用dd命令创建文件---&gt;使用mkswap将/tmp/swap 这个文件格式化为内存交换文件的文件格式----&gt;使用swapon命令启动文件----&gt;使用swapoff可以关闭swap file------&gt;设置自启动[/[swap文件]  swap  swap  defaults  0  0]</li>
+</ol>
+<h2 id="重点回顾"><strong>重点回顾</strong></h2>
+<p>一个可以被挂载的数据通常称为【文件系统，filesystem】,而不是硬盘分区(partition)</p>
 
               </div>
               <div class="toc-container">
@@ -207,6 +229,9 @@ uuidgen 产生新的UUID</p>
 </ul>
 </li>
 <li><a href="#%E8%AE%BE%E7%BD%AE%E5%90%AF%E5%8A%A8%E6%8C%82%E8%BD%BD"><strong>设置启动挂载</strong></a></li>
+<li><a href="#%E7%89%B9%E6%AE%8A%E8%AE%BE%E5%A4%87loop%E6%8C%82%E8%BD%BD"><strong>特殊设备loop挂载</strong></a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E4%BA%A4%E6%8D%A2%E5%8C%BAswap%E5%88%9B%E5%BB%BA"><strong>内存交换区swap创建</strong></a></li>
+<li><a href="#%E9%87%8D%E7%82%B9%E5%9B%9E%E9%A1%BE"><strong>重点回顾</strong></a></li>
 </ul>
 </li>
 </ul>

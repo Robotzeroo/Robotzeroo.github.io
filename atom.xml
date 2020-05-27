@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://Robotzeroo.github.io</id>
     <title>Just enjoy</title>
-    <updated>2020-05-26T11:32:31.094Z</updated>
+    <updated>2020-05-27T07:34:00.266Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://Robotzeroo.github.io"/>
     <link rel="self" href="https://Robotzeroo.github.io/atom.xml"/>
@@ -101,6 +101,28 @@ uuidgen 产生新的UUID</p>
 <h2 id="设置启动挂载"><strong>设置启动挂载</strong></h2>
 <p>编辑etc/fstab 配置文件内容，可以设置启动挂载：<br>
 添加[UUID/设备名] [挂载点] [文件系统] [文件系统参数] [dump] [fsck]</p>
+<h2 id="特殊设备loop挂载"><strong>特殊设备loop挂载</strong></h2>
+<p>如果当初在分区时，你只有划分出一个根目录，假设你已经没有多余的容量可以进行额外的分区，但是根目录的容量还很大。此时你可以制作出一个大文件，将这个文件挂载，如此一来感觉是就多了一个分区，用途广泛。<br>
+例如在/srv下建立一个512MB的大文件，将这个大文件格式化并挂载到/data/file<br>
+dd  if=/dev/zero   of=/srv/loopdev   bs=1M  count=512<br>
+//bs-block size  count-block number<br>
+mkfs.xfs  -f  /srv/loopdev<br>
+blkid  /srv/loopdev<br>
+mount  -o  loop  UUID='xxxx'   /data/file<br>
+nano  /etc/fstab<br>
+:   /srv/loopdev  /data/file  xfs  defaults,loop  0  0<br>
+mkdir  /data/file<br>
+mount -a</p>
+<h2 id="内存交换区swap创建"><strong>内存交换区swap创建</strong></h2>
+<p>意义：当计算机内存不足时，可以将内存中的数据拿到硬盘中暂时存放的地方叫做内存交换分区。</p>
+<ol>
+<li>使用物理分区创建内存交换分区<br>
+分区gdisk--&gt;格式化mkswap---&gt;将swap设备启动[swapon 设备文件名]----&gt;观察free, swapon -s 两个命令观察内存使用量。</li>
+<li>使用文件创建内存交换文件<br>
+使用dd命令创建文件---&gt;使用mkswap将/tmp/swap 这个文件格式化为内存交换文件的文件格式----&gt;使用swapon命令启动文件----&gt;使用swapoff可以关闭swap file------&gt;设置自启动[/[swap文件]  swap  swap  defaults  0  0]</li>
+</ol>
+<h2 id="重点回顾"><strong>重点回顾</strong></h2>
+<p>一个可以被挂载的数据通常称为【文件系统，filesystem】,而不是硬盘分区(partition)</p>
 ]]></content>
     </entry>
     <entry>
