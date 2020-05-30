@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://Robotzeroo.github.io</id>
     <title>Just enjoy</title>
-    <updated>2020-05-27T07:34:00.266Z</updated>
+    <updated>2020-05-30T10:01:56.702Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://Robotzeroo.github.io"/>
     <link rel="self" href="https://Robotzeroo.github.io/atom.xml"/>
@@ -10,6 +10,65 @@
     <logo>https://Robotzeroo.github.io/images/avatar.png</logo>
     <icon>https://Robotzeroo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, Just enjoy</rights>
+    <entry>
+        <title type="html"><![CDATA[认识与学习BASH]]></title>
+        <id>https://Robotzeroo.github.io/post/ren-shi-yu-xue-xi-bash/</id>
+        <link href="https://Robotzeroo.github.io/post/ren-shi-yu-xue-xi-bash/">
+        </link>
+        <updated>2020-05-30T09:09:17.000Z</updated>
+        <summary type="html"><![CDATA[<p>2020/5/30</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>2020/5/30</p>
+<!-- more -->
+<h1 id="认识shell">认识shell</h1>
+<ol>
+<li>用户---&gt;shell---&gt;应用程序---&gt;内核---&gt;硬件</li>
+<li>shell的种类分为：Bourne shell(sh)、C shell、K shell、TCSH、Bourne Again SHell(BASH)。其中BASH是sh的升级版。</li>
+<li>在我们登录系统的时候，系统会给我一个shell来工作，而这个登录所取得的shell就记录在/etc/passwd这个文件夹内。</li>
+<li>Bash shell的功能：
+<ol>
+<li>历史命令：记录在家目录内的 .bash_history中，不过~/.bash_history 记录的是前一次登陆以前所执行过的命令，至于当前所执行的命令都被缓存在内存中，当你成功的注销系统后，该命令才会记录到 .bash_history中。</li>
+<li>命令别名设置功能(alias)：例如 alias lm='ls -al'  //用 lm 代替 ls -al</li>
+<li>任务管理、前台、后台控制</li>
+<li>程序化脚本</li>
+<li>通配符：例如想知道/usr/bin下有多少以X为开头的文件 ls -l /usr/bin/X*</li>
+</ol>
+</li>
+<li>查询命令是否为BASH shell 的内置命令：type<br>
+file: 外部命令<br>
+alias: 别名所设置的命令<br>
+builtin: 内置命令</li>
+</ol>
+<h1 id="shell-的变量功能">Shell 的变量功能</h1>
+<ol>
+<li>利用 echo 命令读出变量，需要在变量前加上‘$’符号如：echo $PATH</li>
+<li>双引号内的特殊字符如 '$' 可以保持原本的特性，单引号内的特殊字符则仅为一般字符（纯文本）</li>
+<li>若该变量需要在子程序执行，则需要以”export 变量“来使变量成为环境变量。</li>
+<li>取消变量的方法：unset 变量</li>
+<li>反单引号“ ` ”，在一串命令中反单引号内的命令将会被先执行。</li>
+<li>查看环境变量：env<br>
+查看BASH内的所有变量：set</li>
+<li>美元符号’$’本身也是一个变量，代表目前这个 shell 的进程号，即所谓的PID(process ID)，用‘echo $$’查看PID号码。</li>
+<li>？：也是一个变量，是上一个执行的命令所返回的值，0代表成功，非0为失败。</li>
+</ol>
+<h1 id="变量键盘读取-数组-声明">变量键盘读取、数组、声明</h1>
+<ol>
+<li>要与用户交互或读取来自键盘输入的变量使用：read [-pt] variable<br>
+-p：接提示字符<br>
+-t：接等待的秒数<br>
+variable：输入值赋给variable变量</li>
+<li>声明变量的类型：declare [-aixr] variable<br>
+-a :将后面的变量定义为数组类型<br>
+-i :将后边的变量定义为整数类型<br>
+-x :将后边的变量编程环境变量<br>
+-r :将变量设置为只读类型，不可修改，也不能unset，需要注销在登陆才能恢复该变量的类型。</li>
+<li>数组的设置方式：<br>
+var[index]=content</li>
+</ol>
+<h1 id="使用ulimit">使用ulimit:</h1>
+<p>bash可以通过ulimit命令限制用户的某些系统资源，包括可以开启的文件数量， 可以使用的CPU时间，可以使用的内存总量等。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Linux文件系统与磁盘]]></title>
         <id>https://Robotzeroo.github.io/post/linux-wen-jian-xi-tong-yu-ci-pan/</id>
