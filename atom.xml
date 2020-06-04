@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://Robotzeroo.github.io</id>
     <title>Just enjoy</title>
-    <updated>2020-05-30T10:01:56.702Z</updated>
+    <updated>2020-06-04T01:44:01.442Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://Robotzeroo.github.io"/>
     <link rel="self" href="https://Robotzeroo.github.io/atom.xml"/>
@@ -66,7 +66,14 @@ variable：输入值赋给variable变量</li>
 var[index]=content</li>
 </ol>
 <h1 id="使用ulimit">使用ulimit:</h1>
-<p>bash可以通过ulimit命令限制用户的某些系统资源，包括可以开启的文件数量， 可以使用的CPU时间，可以使用的内存总量等。</p>
+<p>bash可以通过ulimit命令限制用户的某些系统资源，包括可以开启的文件数量， 可以使用的CPU时间，可以使用的内存总量等。<br>
+#bash从操作环境</p>
+<ol>
+<li>路径与命令查找顺序：以相对/绝对路径执行命令----&gt;由alias找到该命令来执行-----&gt;由bash内置的builtin命令来执行-------&gt;通过$PATH这个变量的顺序找到的第一个命令来执行。可以通过type -a [命令]查找。</li>
+<li>bash的登录与欢迎信息存在/etc/issue和/etc/motd里，其中/etc/motd存储所有用户都能看到的信息。<br>
+#bash的环境文件配置<br>
+<img src="https://Robotzeroo.github.io/post-images/1591235025209.PNG" alt="" loading="lazy"></li>
+</ol>
 ]]></content>
     </entry>
     <entry>
